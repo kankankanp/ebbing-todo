@@ -9,18 +9,22 @@ import {
   ParseIntPipe,
   Header,
   NotFoundException,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { Todo } from '@prisma/client';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('todos')
+@UseGuards(JwtAuthGuard)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   @Get()
   @Header('Content-Type', 'application/json')
-  async findAll(): Promise<Todo[]> {
-    return this.todoService.findAll();
+  async findAll(@Request() req): Promise<Todo[]> {
+    return this.todoService.findAll(req.user.id);
   }
 
   @Get(':id')
@@ -37,31 +41,25 @@ export class TodoController {
   @Header('Content-Type', 'application/json')
   async create(
     @Body() data: { title: string; description?: string },
+    @Request() req,
   ): Promise<Todo> {
-    return this.todoService.create(data);
+    return this.todoService.create(data, req.user.id);
   }
 
   @Put(':id')
   @Header('Content-Type', 'application/json')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() data: { title?: string; description?: string; completed?: boolean },
+    @Request() req,
   ): Promise<Todo> {
-    const todo = await this.todoService.findOne(id);
-    if (!todo) {
-      throw new NotFoundException(`ID ${id} のタスクが見つかりません`);
-    }
-    return this.todoService.update(id, data);
+    return this.todoService.update(+id, data, req.user.id);
   }
 
   @Delete(':id')
   @Header('Content-Type', 'application/json')
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<Todo> {
-    const todo = await this.todoService.findOne(id);
-    if (!todo) {
-      throw new NotFoundException(`ID ${id} のタスクが見つかりません`);
-    }
-    return this.todoService.delete(id);
+  async delete(@Param('id') id: string, @Request() req): Promise<Todo> {
+    return this.todoService.delete(+id, req.user.id);
   }
 
   @Put(':id/study')

@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
-
-type Todo = Prisma.TodoGetPayload<{}>;
+import { Todo } from '@prisma/client';
 
 @Injectable()
 export class TodoService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<Todo[]> {
-    return this.prisma.todo.findMany();
+  async findAll(userId: number): Promise<Todo[]> {
+    return this.prisma.todo.findMany({
+      where: {
+        userId: userId,
+      },
+    });
   }
 
   async findOne(id: number): Promise<Todo | null> {
@@ -18,25 +20,42 @@ export class TodoService {
     });
   }
 
-  async create(data: { title: string; description?: string }): Promise<Todo> {
+  async create(
+    data: { title: string; description?: string },
+    userId: number,
+  ): Promise<Todo> {
     return this.prisma.todo.create({
-      data,
+      data: {
+        ...data,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
     });
   }
 
   async update(
     id: number,
-    data: { title?: string; description?: string; completed?: boolean },
+    data: { title?: string; description?: string },
+    userId: number,
   ): Promise<Todo> {
     return this.prisma.todo.update({
-      where: { id },
+      where: {
+        id: id,
+        userId: userId,
+      },
       data,
     });
   }
 
-  async delete(id: number): Promise<Todo> {
+  async delete(id: number, userId: number): Promise<Todo> {
     return this.prisma.todo.delete({
-      where: { id },
+      where: {
+        id: id,
+        userId: userId,
+      },
     });
   }
 
