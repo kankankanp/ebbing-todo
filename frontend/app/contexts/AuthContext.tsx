@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -30,12 +31,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = (newToken: string) => {
+  const GUEST_EMAIL = "guest@example.com";
+  const GUEST_PASSWORD = "guestpassword";
+
+  const login = async (tokenOrType: string) => {
     try {
-      localStorage.setItem("token", newToken);
-      setToken(newToken);
+      if (tokenOrType === "guest-token") {
+        // ゲストログイン時はAPI経由でトークン取得
+        const res = await fetch("http://localhost:3001/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: GUEST_EMAIL,
+            password: GUEST_PASSWORD,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok)
+          throw new Error(data.message || "ゲストログインに失敗しました");
+        localStorage.setItem("token", data.token);
+        Cookies.set("token", data.token, { path: "/" });
+        setToken(data.token);
+        setIsAuthenticated(true);
+        router.push("/todos");
+        router.refresh();
+        return;
+      }
+      // 通常ログイン
+      localStorage.setItem("token", tokenOrType);
+      Cookies.set("token", tokenOrType, { path: "/" });
+      setToken(tokenOrType);
       setIsAuthenticated(true);
       router.push("/todos");
+      router.refresh();
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -44,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     try {
       localStorage.removeItem("token");
+      Cookies.remove("token", { path: "/" }); // cookieも削除
       setToken(null);
       setIsAuthenticated(false);
       router.push("/login");

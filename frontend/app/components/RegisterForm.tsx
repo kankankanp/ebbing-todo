@@ -38,6 +38,8 @@ export default function RegisterForm() {
 
       const responseData = await response.json();
 
+      console.log(responseData);
+
       if (!response.ok) {
         throw new Error(responseData.message || "登録に失敗しました");
       }
@@ -146,12 +148,21 @@ export default function RegisterForm() {
           新規登録
         </motion.button>
       </form>
+      <div className="mt-4 flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => login("guest-token")}
+          className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-lg shadow-sm text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 mb-2"
+        >
+          ゲストログイン
+        </button>
+      </div>
 
       <div className="mt-6 text-center">
         <p className="text-sm text-blue-600">
           すでにアカウントをお持ちの方は
           <Link
-            href="/login"
+            href="/todos"
             className="font-medium text-blue-500 hover:text-blue-400 ml-1"
           >
             ログイン

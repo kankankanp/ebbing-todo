@@ -118,6 +118,15 @@ export default function LoginForm() {
           ログイン
         </motion.button>
       </form>
+      <div className="mt-4 flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => login("guest-token")}
+          className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-lg shadow-sm text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 mb-2"
+        >
+          ゲストログイン
+        </button>
+      </div>
 
       <div className="mt-6 text-center">
         <p className="text-sm text-blue-600">
