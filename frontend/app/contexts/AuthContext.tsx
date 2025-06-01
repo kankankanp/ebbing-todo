@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
 
@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }),
         });
         const data = await res.json();
+        console.log(res);
         if (!res.ok)
           throw new Error(data.message || "ゲストログインに失敗しました");
         localStorage.setItem("token", data.token);

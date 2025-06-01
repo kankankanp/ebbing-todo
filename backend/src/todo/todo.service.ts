@@ -24,6 +24,7 @@ export class TodoService {
     data: { title: string; description?: string },
     userId: number,
   ): Promise<Todo> {
+    console.log(userId)
     return this.prisma.todo.create({
       data: {
         ...data,

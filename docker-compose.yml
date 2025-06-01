@@ -9,7 +9,6 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=development
     depends_on:
@@ -21,6 +20,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
+      - "5555:5555"  # Port for Prisma Studio
     volumes:
       - ./backend:/app
       - /app/node_modules

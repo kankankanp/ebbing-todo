@@ -78,7 +78,6 @@ export default function Todo() {
 
     try {
       setIsSubmitting(true);
-      console.log("タスク追加開始:", newTodo);
 
       if (!newTodo.title.trim()) {
         setError("タイトルを入力してください");
@@ -86,6 +85,7 @@ export default function Todo() {
       }
 
       const response = await addTodo(newTodo);
+      console.log(response);
       console.log("タスク追加成功:", response);
 
       setNewTodo({ title: "", description: "" });
